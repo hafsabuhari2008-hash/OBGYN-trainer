@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OBGYNTrain">
+<meta name="theme-color" content="#0a0f0f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>OB/GYN Clinical Trainer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0f0f;--s1:#111818;--s2:#172020;--bd:#1e2c2c;--bd2:#2a3c3c;--teal:#00c9a7;--teal2:#00a889;--tdim:rgba(0,201,167,.13);--amber:#f0a500;--adim:rgba(240,165,0,.13);--coral:#e05c5c;--cdim:rgba(224,92,92,.13);--blue:#4a9eff;--bdim:rgba(74,158,255,.13);--purple:#a78bfa;--pdim:rgba(167,139,250,.13);--green:#4ade80;--gdim:rgba(74,222,128,.13);--tx:#e8f0f0;--tx2:#7a9e9e;--tx3:#3d5c5c;--sf:'DM Serif Display',Georgia,serif;--ss:'DM Sans',system-ui,sans-serif;--sm:'DM Mono','Courier New',monospace;--st:env(safe-area-inset-top,44px);--sb:env(safe-area-inset-bottom,20px)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:var(--ss);background:var(--bg);color:var(--tx)}
+.shell{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+.status-bar{background:var(--s1);height:var(--st);flex-shrink:0}
+.top-nav{background:var(--s1);border-bottom:1px solid var(--bd);padding:0 16px;height:52px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-logo{width:32px;height:32px;background:var(--tdim);border:1px solid rgba(0,201,167,.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--sf);font-size:17px;color:var(--teal);flex-shrink:0}
+.nav-title{font-family:var(--sf);font-size:16px;font-weight:400;color:var(--tx);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.online-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background .5s}
+.online-dot.on{background:#4ade80}.online-dot.off{background:#e05c5c}
+.screens{flex:1;overflow:hidden;position:relative}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.scroll-area::-webkit-scrollbar{display:none}
+/* HOME */
+.home-hero{padding:18px 16px 12px;background:var(--s1);border-bottom:1px solid var(--bd)}
+.home-hero h2{font-family:var(--sf);font-size:21px;font-weight:400;font-style:italic;color:var(--tx);margin-bottom:3px}
+.home-hero p{font-size:11px;color:var(--tx2);line-height:1.5}
+.sec-head{font-family:var(--sm);font-size:10px;color:var(--tx3);letter-spacing:.14em;text-transform:uppercase;padding:13px 16px 6px}
+.mod-list{padding:0 12px 6px;display:flex;flex-direction:column;gap:6px}
+.mod-item{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:11px;cursor:pointer;position:relative;overflow:hidden}
+.mod-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:12px 0 0 12px}
+.clinical::before{background:var(--teal)}.surgical::before{background:var(--amber)}.oral::before{background:var(--purple)}.emergency::before{background:var(--coral)}.drugs::before{background:var(--green)}.reference::before{background:var(--blue)}
+.mod-item:active{transform:scale(.98);opacity:.85}
+.mod-ic{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.clinical .mod-ic{background:var(--tdim)}.surgical .mod-ic{background:var(--adim)}.oral .mod-ic{background:var(--pdim)}.emergency .mod-ic{background:var(--cdim)}.drugs .mod-ic{background:var(--gdim)}.reference .mod-ic{background:var(--bdim)}
+.mod-inf{flex:1;min-width:0}.mod-nm{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:1px}.mod-sb{font-size:10px;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--sm)}
+.mod-arr{color:var(--tx3);font-size:15px;flex-shrink:0}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 12px 12px}
+.qcard{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:11px;cursor:pointer}
+.qcard:active{transform:scale(.97);opacity:.8}
+.qcard-ic{font-size:17px;margin-bottom:4px}.qcard-t{font-size:11px;font-weight:600;color:var(--tx);margin-bottom:1px;line-height:1.3}.qcard-s{font-size:10px;color:var(--tx3);line-height:1.3;font-family:var(--sm)}
+/* TRAIN */
+.train-hdr{background:var(--s1);border-bottom:1px solid var(--bd);padding:9px 13px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.back-btn{width:30px;height:30px;background:var(--s2);border:1px solid var(--bd2);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--tx2);flex-shrink:0}
+.back-btn:active{opacity:.6}
+.train-ttl{font-family:var(--sf);font-size:14px;font-weight:400;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mode-badge{font-family:var(--sm);font-size:9px;padding:2px 7px;border-radius:8px;flex-shrink:0;letter-spacing:.05em}
+.mode-badge.online{background:var(--tdim);color:var(--teal);border:1px solid rgba(0,201,167,.3)}
+.mode-badge.offline{background:var(--bdim);color:var(--blue);border:1px solid rgba(74,158,255,.3)}
+.topics-scroll{background:var(--s1);border-bottom:1px solid var(--bd);padding:7px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;flex-shrink:0}
+.topics-scroll::-webkit-scrollbar{display:none}
+.topics-inner{padding:0 10px;display:inline-flex;gap:5px}
+.chip{display:inline-flex;align-items:center;padding:5px 10px;border-radius:16px;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-size:11px;cursor:pointer;white-space:nowrap;font-family:var(--ss)}
+.chip:active{transform:scale(.96)}
+.chip.teal{border-color:var(--teal);color:var(--teal);background:var(--tdim)}.chip.amber{border-color:var(--amber);color:var(--amber);background:var(--adim)}.chip.purple{border-color:var(--purple);color:var(--purple);background:var(--pdim)}.chip.coral{border-color:var(--coral);color:var(--coral);background:var(--cdim)}.chip.green{border-color:var(--green);color:var(--green);background:var(--gdim)}.chip.blue{border-color:var(--blue);color:var(--blue);background:var(--bdim)}
+.chat-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;display:flex;flex-direction:column;gap:9px;overscroll-behavior:contain}
+.chat-scroll::-webkit-scrollbar{display:none}
+.msg-row{display:flex;gap:7px;animation:su .2s ease}
+.msg-row.user{flex-direction:row-reverse}
+@keyframes su{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.av{width:25px;height:25px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--sm);font-weight:500;flex-shrink:0;margin-top:2px}
+.av.ai{background:var(--tdim);color:var(--teal);border:1px solid rgba(0,201,167,.3)}.av.me{background:var(--s2);color:var(--tx2);border:1px solid var(--bd2)}
+.bubble{max-width:86%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.65}
+.msg-row.ai .bubble{background:var(--s2);border:1px solid var(--bd);border-radius:3px 12px 12px 12px;color:var(--tx)}
+.msg-row.user .bubble{background:var(--tdim);border:1px solid rgba(0,201,167,.22);border-radius:12px 3px 12px 12px;color:var(--tx)}
+.bubble .bh{font-family:var(--sf);font-size:14px;color:var(--teal);margin:8px 0 4px;font-weight:400}.bubble .bh:first-child{margin-top:0}
+.bubble .step{margin:5px 0;padding:6px 9px;background:rgba(0,0,0,.35);border-left:2px solid var(--teal);border-radius:0 6px 6px 0}
+.bubble .sn{font-family:var(--sm);font-size:9px;color:var(--teal);letter-spacing:.1em;margin-bottom:2px}.bubble .st{font-size:12px;line-height:1.55}
+.bubble .warn{margin:5px 0;padding:6px 9px;background:var(--cdim);border-left:2px solid var(--coral);border-radius:0 6px 6px 0;font-size:12px;color:#ffa0a0;line-height:1.5}
+.bubble .pearl{margin:5px 0;padding:6px 9px;background:var(--adim);border-left:2px solid var(--amber);border-radius:0 6px 6px 0;font-size:12px;color:#ffd080;line-height:1.5}
+.bubble .blt{padding:2px 0 2px 9px;border-left:1px solid var(--bd2);margin:2px 0;font-size:12px;color:var(--tx2);line-height:1.5}
+.bubble table{width:100%;border-collapse:collapse;margin:6px 0;font-size:11px}
+.bubble th{background:rgba(0,0,0,.4);color:var(--teal);font-family:var(--sm);font-size:9px;padding:4px 6px;text-align:left;border-bottom:1px solid var(--bd)}
+.bubble td{padding:4px 6px;border-bottom:1px solid var(--bd);color:var(--tx2);vertical-align:top;line-height:1.4}
+.bubble tr:last-child td{border-bottom:none}
+.dots{display:flex;gap:4px;padding:3px 0;align-items:center}
+.dot{width:5px;height:5px;background:var(--teal);border-radius:50%;animation:pu 1.2s ease-in-out infinite;opacity:.3}
+.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+@keyframes pu{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.1)}}
+.input-bar{background:var(--s1);border-top:1px solid var(--bd);padding:8px 10px;padding-bottom:calc(8px + var(--sb));display:flex;gap:7px;align-items:flex-end;flex-shrink:0}
+.input-wrap{flex:1}
+textarea{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:17px;padding:8px 13px;color:var(--tx);font-family:var(--ss);font-size:14px;resize:none;outline:none;transition:border-color .2s;line-height:1.4;min-height:36px;max-height:85px;-webkit-appearance:none;display:block}
+textarea:focus{border-color:var(--teal)}textarea::placeholder{color:var(--tx3)}
+.send{width:36px;height:36px;background:var(--teal);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:#0a0f0f;flex-shrink:0;font-weight:700}
+.send:active{transform:scale(.92);background:var(--teal2)}.send:disabled{opacity:.35}
+.empty-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:9px;text-align:center}
+.ei{font-size:40px;opacity:.3}.et{font-family:var(--sf);font-size:17px;font-style:italic;color:var(--tx2)}.es{font-size:11px;color:var(--tx3);line-height:1.6;max-width:230px}
+.qph{display:flex;flex-direction:column;gap:5px;width:100%;max-width:290px;margin-top:2px}
+.qpb{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 11px;text-align:left;cursor:pointer;font-size:11px;color:var(--tx2);font-family:var(--ss);line-height:1.4}
+.qpb:active{transform:scale(.98);border-color:var(--teal);color:var(--teal)}
+/* REFERENCE */
+.ref-content{padding:0 12px 16px}
+.ref-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;margin-bottom:6px;overflow:hidden}
+.ref-hd{padding:11px 13px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.ref-hd:active{opacity:.7}
+.ref-ic{font-size:16px;width:24px;text-align:center}.ref-tt{font-size:13px;font-weight:600;flex:1}.ref-ch{color:var(--tx3);font-size:13px;transition:transform .2s}
+.ref-card.open .ref-ch{transform:rotate(90deg)}
+.ref-body{display:none;padding:0 13px 11px;border-top:1px solid var(--bd)}
+.ref-card.open .ref-body{display:block}
+.ref-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:7px}
+.ref-tbl th{background:rgba(0,0,0,.3);color:var(--teal);font-family:var(--sm);font-size:9px;padding:4px 6px;text-align:left;border-bottom:1px solid var(--bd)}
+.ref-tbl td{padding:4px 6px;border-bottom:1px solid var(--bd);color:var(--tx2);line-height:1.4;vertical-align:top}
+.ref-tbl tr:last-child td{border-bottom:none}
+.ref-lst{margin-top:7px;display:flex;flex-direction:column;gap:3px}
+.ref-li{padding:5px 8px;background:rgba(0,0,0,.2);border-radius:5px;font-size:11px;color:var(--tx2);line-height:1.5;border-left:2px solid var(--bd2)}
+.ref-li.hi{border-left-color:var(--teal);color:var(--teal)}.ref-li.wa{border-left-color:var(--coral);color:#ffa0a0}
+/* LOGBOOK */
+.lb-content{padding:0 12px 16px}
+.lb-tracker{background:var(--s1);border:1px solid var(--bd);border-radius:12px;margin-bottom:6px;overflow:hidden}
+.lb-hd{padding:11px 13px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.lb-hd:active{opacity:.7}
+.lb-tt{font-size:13px;font-weight:600;flex:1}.lb-ch{color:var(--tx3);font-size:13px;transition:transform .2s}
+.lb-tracker.open .lb-ch{transform:rotate(90deg)}
+.lb-body{display:none;padding:0 13px 11px;border-top:1px solid var(--bd)}
+.lb-tracker.open .lb-body{display:block}
+.lb-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)}
+.lb-row:last-of-type{border-bottom:none}
+.lb-name{flex:1;font-size:11px;color:var(--tx);line-height:1.4}
+.lb-tgt{font-family:var(--sm);font-size:9px;color:var(--tx3);white-space:nowrap}
+.lb-inp{width:46px;background:var(--bg);border:1px solid var(--bd2);border-radius:5px;padding:3px 6px;color:var(--teal);font-family:var(--sm);font-size:11px;text-align:center;outline:none;-webkit-appearance:none}
+.lb-inp:focus{border-color:var(--teal)}
+.lb-bw{width:60px;height:5px;background:var(--bd2);border-radius:3px;flex-shrink:0}
+.lb-bar{height:5px;border-radius:3px;background:var(--teal);transition:width .3s}
+.lb-pct{font-family:var(--sm);font-size:9px;color:var(--tx3);width:26px;text-align:right;flex-shrink:0}
+.save-btn{width:100%;margin-top:8px;padding:8px;background:var(--tdim);border:1px solid rgba(0,201,167,.3);border-radius:7px;color:var(--teal);font-size:12px;font-weight:600;font-family:var(--ss);cursor:pointer}
+.save-btn:active{opacity:.7}
+/* SETTINGS */
+.set-content{padding:12px}
+.set-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;margin-bottom:8px;overflow:hidden;padding:14px}
+.set-label{font-family:var(--sm);font-size:10px;color:var(--tx3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.set-inp{width:100%;background:var(--bg);border:1px solid var(--bd2);border-radius:8px;padding:10px 13px;color:var(--tx);font-family:var(--sm);font-size:12px;outline:none;-webkit-appearance:none}
+.set-inp:focus{border-color:var(--teal)}
+.set-inp::placeholder{color:var(--tx3)}
+.set-note{font-size:11px;color:var(--tx3);margin-top:7px;line-height:1.5}
+.set-btn{width:100%;margin-top:8px;padding:10px;background:var(--tdim);border:1px solid rgba(0,201,167,.3);border-radius:8px;color:var(--teal);font-size:13px;font-weight:600;font-family:var(--ss);cursor:pointer}
+.set-btn:active{opacity:.7}
+.set-status{font-family:var(--sm);font-size:11px;margin-top:8px;padding:8px 10px;border-radius:7px;text-align:center}
+.set-status.ok{background:var(--tdim);color:var(--teal);border:1px solid rgba(0,201,167,.3)}
+.set-status.err{background:var(--cdim);color:var(--coral);border:1px solid rgba(224,92,92,.3)}
+/* TAB BAR */
+.tab-bar{background:var(--s1);border-top:1px solid var(--bd);display:flex;height:calc(58px + var(--sb));padding-bottom:var(--sb);flex-shrink:0}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:6px 0 0}
+.tab:active{opacity:.5}
+.tab-ic{font-size:20px;line-height:1}.tab-lb{font-size:9px;color:var(--tx3);font-family:var(--sm)}
+.tab.active .tab-lb{color:var(--teal)}.tab.active .tab-ic{filter:drop-shadow(0 0 4px rgba(0,201,167,.5))}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="status-bar"></div>
+<div class="top-nav">
+  <div class="nav-logo">℞</div>
+  <div class="nav-title" id="navTitle">OB/GYN Clinical Trainer</div>
+  <div class="online-dot off" id="onlineDot" title="Connection status"></div>
+</div>
+<div class="screens">
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+<div class="scroll-area">
+  <div class="home-hero">
+    <h2>OB/GYN Clinical Trainer</h2>
+    <p>NPMCN · WACS · RCOG 2024 · NICE · WHO — Senior Residents & Consultants</p>
+  </div>
+  <div class="sec-head">Training Domains</div>
+  <div class="mod-list">
+    <div class="mod-item clinical" onclick="openMod('clinical')"><div class="mod-ic">🧠</div><div class="mod-inf"><div class="mod-nm">Clinical Skills</div><div class="mod-sb">Antenatal · Intrapartum · Postnatal · Gynaecology · Oncology</div></div><div class="mod-arr">›</div></div>
+    <div class="mod-item surgical" onclick="openMod('surgical')"><div class="mod-ic">⚕</div><div class="mod-inf"><div class="mod-nm">Surgical Skills</div><div class="mod-sb">LSCS · Instrumental · Hysterectomy · Laparoscopy · Emergencies</div></div><div class="mod-arr">›</div></div>
+    <div class="mod-item oral" onclick="openMod('oral')"><div class="mod-ic">🎤</div><div class="mod-inf"><div class="mod-nm">Oral Skills</div><div class="mod-sb">Long Case · Viva · OSCE · NPMCN · WACS Format</div></div><div class="mod-arr">›</div></div>
+    <div class="mod-item emergency" onclick="openMod('emergency')"><div class="mod-ic">🚨</div><div class="mod-inf"><div class="mod-nm">Obstetric Emergencies</div><div class="mod-sb">PPH · Eclampsia · Shoulder Dystocia · Cord Prolapse</div></div><div class="mod-arr">›</div></div>
+    <div class="mod-item drugs" onclick="openMod('drugs')"><div class="mod-ic">💊</div><div class="mod-inf"><div class="mod-nm">Drug Protocols</div><div class="mod-sb">Uterotonics · MgSO4 · Antihypertensives · Tocolytics</div></div><div class="mod-arr">›</div></div>
+  </div>
+  <div class="sec-head">Quick Access</div>
+  <div class="quick-grid">
+    <div class="qcard" onclick="openModAsk('emergency','pph')"><div class="qcard-ic">🩸</div><div class="qcard-t">PPH Protocol</div><div class="qcard-s">Full algorithm + doses</div></div>
+    <div class="qcard" onclick="openModAsk('emergency','eclampsia')"><div class="qcard-ic">⚡</div><div class="qcard-t">Eclampsia Protocol</div><div class="qcard-s">MgSO4 + management</div></div>
+    <div class="qcard" onclick="openModAsk('surgical','lscs')"><div class="qcard-ic">🔪</div><div class="qcard-t">LSCS Steps</div><div class="qcard-s">Operative guide</div></div>
+    <div class="qcard" onclick="openModAsk('oral','longcase')"><div class="qcard-ic">🎤</div><div class="qcard-t">Long Case Guide</div><div class="qcard-s">NPMCN Part II format</div></div>
+    <div class="qcard" onclick="openModAsk('clinical','ctg')"><div class="qcard-ic">📈</div><div class="qcard-t">CTG Interpretation</div><div class="qcard-s">FIGO 2015 classification</div></div>
+    <div class="qcard" onclick="openModAsk('drugs','all')"><div class="qcard-ic">💉</div><div class="qcard-t">Emergency Drugs</div><div class="qcard-s">All doses in one view</div></div>
+  </div>
+  <div style="height:10px"></div>
+</div>
+</div>
+
+<!-- TRAIN -->
+<div class="screen" id="screen-train">
+  <div class="train-hdr">
+    <div class="back-btn" onclick="goHome()">‹</div>
+    <div class="train-ttl" id="trainTitle">Module</div>
+    <div class="mode-badge offline" id="modeBadge">OFFLINE</div>
+  </div>
+  <div class="topics-scroll"><div class="topics-inner" id="topicsInner"></div></div>
+  <div class="chat-scroll" id="chatScroll"></div>
+  <div class="input-bar">
+    <div class="input-wrap"><textarea id="chatInput" placeholder="Ask a question or tap a topic above..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea></div>
+    <button class="send" id="sendBtn" onclick="sendMsg()">↑</button>
+  </div>
+</div>
+
+<!-- REFERENCE -->
+<div class="screen" id="screen-ref">
+<div class="scroll-area">
+  <div class="sec-head">Clinical Reference — Works Offline</div>
+  <div class="ref-content" id="refContent"></div>
+</div>
+</div>
+
+<!-- LOGBOOK -->
+<div class="screen" id="screen-lb">
+<div class="scroll-area">
+  <div class="sec-head">NPMCN / WACS Logbook Tracker</div>
+  <div class="lb-content" id="lbContent"></div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div class="screen" id="screen-set">
+<div class="scroll-area">
+  <div class="sec-head">Settings</div>
+  <div class="set-content">
+    <div class="set-card">
+      <div class="set-label">Anthropic API Key (for live AI)</div>
+      <input class="set-inp" type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off" autocorrect="off" spellcheck="false">
+      <div class="set-note">Get a free key at <strong>console.anthropic.com</strong> → API Keys → Create Key. Your key is stored only on this device and never sent anywhere except Anthropic's servers.</div>
+      <button class="set-btn" onclick="saveKey()">Save API Key</button>
+      <div id="keyStatus"></div>
+    </div>
+    <div class="set-card">
+      <div class="set-label">Offline Mode</div>
+      <div class="set-note">All topics have built-in consultant-level content that works without internet. The app automatically uses offline content when no API key is set or when you are not connected. Online AI gives more detailed, interactive responses.</div>
+    </div>
+    <div class="set-card">
+      <div class="set-label">About</div>
+      <div class="set-note">Aligned to: NPMCN Fellowship Curriculum · WACS OB/GYN Faculty · RCOG Curriculum 2024 (CiPs & SITMs) · NICE Guidelines · WHO Standards.<br><br>Built for senior residents and consultants in Nigeria and West Africa.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div><!-- /screens -->
+<div class="tab-bar">
+  <div class="tab active" id="tab-home" onclick="switchTab('home')"><div class="tab-ic">🏠</div><div class="tab-lb">HOME</div></div>
+  <div class="tab" id="tab-train" onclick="switchTab('train')"><div class="tab-ic">⚕</div><div class="tab-lb">TRAIN</div></div>
+  <div class="tab" id="tab-ref" onclick="switchTab('ref')"><div class="tab-ic">📋</div><div class="tab-lb">REFERENCE</div></div>
+  <div class="tab" id="tab-lb" onclick="switchTab('lb')"><div class="tab-ic">📓</div><div class="tab-lb">LOGBOOK</div></div>
+  <div class="tab" id="tab-set" onclick="switchTab('set')"><div class="tab-ic">⚙️</div><div class="tab-lb">SETTINGS</div></div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// OFFLINE CONTENT LIBRARY — full consultant-level content
+// ═══════════════════════════════════════════════════════════════
+const CONTENT = {
+
+// ── CLINICAL ──────────────────────────────────────────────────
+'clinical:Antenatal Risk Assessment':`## Structured Antenatal Risk Assessment
+🔑 Risk stratification at booking determines care pathway: low-risk (midwife-led), high-risk (consultant-led), or shared care.
+
+## History
+- Obstetric history: parity, previous CS, PPH, stillbirth, neonatal death, preterm birth, PET, GDM
+- Medical: hypertension, diabetes, renal, cardiac, thyroid, thrombophilia, SLE
+- Surgical: uterine surgery (myomectomy, cone biopsy), cervical procedures
+- Family: twinning, pre-eclampsia, thrombosis, congenital anomalies
+
+## Examination at Booking
+- BMI (underweight <18.5, overweight >25, obese >30, morbidly obese >40)
+- Blood pressure — baseline for hypertensive comparison
+- Urine dipstick — proteinuria, glucose, infection
+
+## Investigations (NICE NG201 — Antenatal Care 2023)
+- FBC, blood group and antibodies, rubella immunity, hepatitis B, HIV, syphilis
+- MSU for culture, haemoglobin electrophoresis (sickle cell and thalassaemia screening)
+- Fasting blood glucose or HbA1c if risk factors for GDM
+
+## High-Risk Features Requiring Consultant Input
+- Previous CS, uterine surgery, placenta praevia history
+- Pre-existing medical conditions (cardiac, renal, diabetic, hypertensive)
+- BMI >40, multiple pregnancy, previous preterm birth <34 weeks
+- Thrombophilia, previous VTE, antiphospholipid syndrome
+
+⚠️ Every woman must have a documented care plan at booking specifying who leads her care and what surveillance is required.
+
+🔑 Pearl: A woman with a previous classical CS or inverted T incision has a uterine rupture risk of 4-9% — trial of labour is contraindicated. Document and plan elective CS at 36-37 weeks.`,
+
+'clinical:CTG Interpretation':`## CTG Interpretation — FIGO 2015 Classification
+
+## The Four Features (DR C BRAVADO)
+Define Rate Contractions | Baseline Rate | Variability | Accelerations | Decelerations | Overall
+
+## Baseline Rate
+- Normal: 110–160 bpm
+- Non-reassuring: 100–109 bpm or 161–180 bpm
+- Abnormal: <100 bpm or >180 bpm or sinusoidal
+
+## Variability (amplitude of fluctuation)
+- Normal: 5–25 bpm (baseline fluctuation)
+- Non-reassuring: <5 bpm for 40–90 min OR >25 bpm for >30 min
+- Abnormal: <5 bpm for >90 min or sinusoidal
+
+## Accelerations
+- Reassuring: present (rise ≥15 bpm for ≥15 seconds)
+- Non-reassuring: absent after 32 weeks (not pathological alone)
+
+## Decelerations
+- Early decelerations: onset with contraction, nadir with peak — head compression — reassuring
+- Variable decelerations: abrupt onset/offset — cord compression — non-reassuring if >30 sec
+- Late decelerations: onset after contraction peak, slow recovery — uteroplacental insufficiency — always abnormal
+- Prolonged deceleration: >3 min — non-reassuring; >5 min — abnormal
+
+## FIGO Classification
+| Category | Features | Action |
+|---|---|---|
+| Normal | All 4 reassuring | Continue monitoring |
+| Suspicious | 1 non-reassuring | Conservative measures + continuous CTG |
+| Pathological | ≥2 non-reassuring OR 1 abnormal | Immediate review; consider delivery |
+| Sinusoidal | Smooth sine wave ≥10 min | Emergency delivery |
+
+## Conservative Measures (for suspicious CTG)
+1. Change maternal position (left lateral)
+2. IV fluid bolus if hypotension
+3. Stop oxytocin
+4. Exclude cord prolapse
+5. Fetal blood sampling if available and appropriate
+
+⚠️ A prolonged deceleration >9 min = pathological. Call for help. Prepare for emergency delivery.
+
+🔑 Pearl: Late decelerations with REDUCED variability = severe fetal compromise. Act immediately. Late decelerations with normal variability = early uteroplacental insufficiency — escalate but not immediate emergency.`,
+
+'clinical:Hypertensive Disorders':`## Hypertensive Disorders in Pregnancy — NICE NG133
+
+## Definitions
+- Chronic hypertension: BP ≥140/90 before 20 weeks or pre-existing
+- Gestational hypertension: BP ≥140/90 after 20 weeks, no proteinuria
+- Pre-eclampsia: BP ≥140/90 after 20 weeks + proteinuria (PCR ≥30mg/mmol or dipstick ≥2+) OR BP ≥140/90 + any feature of severe disease
+- Severe hypertension: systolic ≥160 or diastolic ≥110
+
+## Severe Pre-eclampsia — Any of:
+- BP ≥160/110
+- Proteinuria ≥5g/24hrs
+- Oliguria <500ml/24hrs
+- Pulmonary oedema
+- Thrombocytopaenia <100 × 10⁹/L
+- Liver enzymes 2× upper limit
+- Severe headache, visual disturbance, epigastric pain (HELLP warning signs)
+
+## HELLP Syndrome
+- Haemolysis (LDH >600, microangiopathic haemolysis on film)
+- Elevated Liver enzymes (AST/ALT >2× ULN)
+- Low Platelets (<100 × 10⁹/L)
+⚠️ HELLP = delivery irrespective of gestation. ITU/HDU admission. Transfuse platelets if <50 or before CS.
+
+## Antihypertensive Treatment Thresholds
+- Treat if systolic ≥150 or diastolic ≥100 (to prevent stroke)
+- Target: systolic 135–145, diastolic 85–95
+
+## Acute Severe Hypertension — First-line Options
+1. Labetalol 200mg oral OR 50mg IV bolus (avoid in asthma)
+2. Nifedipine modified release 10–20mg oral (NEVER sublingual)
+3. Hydralazine 5mg IV slow bolus if above unavailable
+
+## Delivery Timing
+- Severe PET/HELLP: deliver after stabilisation, steroids if <34+6 weeks
+- Gestational hypertension or mild PET at ≥37 weeks: IOL recommended
+- Pre-eclampsia <34 weeks: expectant management in specialist centre with twice-daily monitoring
+
+🔑 Pearl: Check PlGF (placental growth factor) where available — low PlGF (<100pg/ml between 20-34 weeks) has 96% sensitivity for pre-eclampsia requiring delivery within 14 days.`,
+
+'clinical:Fetal Growth Restriction':`## Fetal Growth Restriction — RCOG GTG 31
+
+## Definitions
+- Small for Gestational Age (SGA): EFW or AC <10th centile
+- FGR: EFW or AC <10th centile + evidence of placental insufficiency (abnormal Dopplers)
+- Severe FGR: EFW or AC <3rd centile regardless of Doppler
+
+## Doppler Surveillance — Umbilical Artery (UA)
+| UA Doppler | Interpretation | Surveillance |
+|---|---|---|
+| Normal PI | Reassuring | 2-weekly USS + Doppler |
+| Elevated PI (>95th centile) | Mild placental resistance | Weekly USS + Doppler |
+| Absent end-diastolic flow (AEDF) | Significant compromise | Twice weekly + daily CTG |
+| Reversed end-diastolic flow (REDF) | Severe compromise | Deliver — admit immediately |
+
+## Additional Dopplers
+- Middle Cerebral Artery (MCA): brain sparing when MCA PI <5th centile (CPR <1.0)
+- Ductus Venosus (DV): abnormal waveform (absent/reversed A-wave) = imminent acidaemia — deliver
+
+## Delivery Timing (Delphi Consensus / RCOG)
+- REDF UA + <30 weeks: individualised with neonatal team
+- REDF UA + ≥30 weeks: deliver after steroids
+- AEDF UA: deliver at 34 weeks (or earlier if CTG/BPP abnormal)
+- Elevated UA PI: deliver at 37 weeks
+- SGA (normal Dopplers): deliver at 37–40 weeks depending on centile trend
+
+## Antenatal Steroids
+Give betamethasone 12mg IM × 2 doses (24hrs apart) if delivering <34+6 weeks
+
+⚠️ Never induce labour in REDF without continuous fetal monitoring and paediatric team on standby.
+
+🔑 Pearl: The sequence of deterioration — UA AEDF → UA REDF → abnormal MCA → abnormal DV → CTG late decelerations/reduced variability. Plan delivery before CTG becomes pathological.`,
+
+'clinical:Antepartum Haemorrhage':`## Antepartum Haemorrhage (APH) — RCOG GTG 10b
+
+## Definition
+Bleeding from genital tract after 24 weeks and before delivery of baby.
+
+## Classification
+- Minor APH: <50ml, settled, no maternal/fetal compromise
+- Major APH: 50–1000ml without shock
+- Massive APH: >1000ml OR any amount with maternal/fetal compromise
+
+## Causes — ABCDE
+- Antepartum causes: Placenta praevia, Placental abruption, Vasa praevia
+- Bloody show (normal)
+- Cervical causes: ectropion, polyp, cervicitis, carcinoma
+- Decidual / unclassified (50% of APH)
+- Extragenital (haematuria, haemorrhoids)
+
+## Placenta Praevia
+- Placenta covering or within 2cm of internal os
+- Painless bright red bleeding, well-contracted uterus
+- ⚠️ NO VAGINAL EXAMINATION — risk of catastrophic haemorrhage
+- Delivery: LSCS — timing based on severity and gestation
+
+## Placental Abruption
+- Premature separation of normally-sited placenta
+- Painful, tense/woody uterus, dark bleeding (may be concealed)
+- Coagulopathy risk — check FBC, coagulation, fibrinogen
+- CTG abnormality: late decelerations, reduced variability, bradycardia
+
+## Immediate Management (all APH)
+1. IV access ×2 (large bore), bloods (FBC, coag, G&S/crossmatch, fibrinogen)
+2. Continuous CTG
+3. IV fluid resuscitation if haemodynamically compromised
+4. Obstetric and anaesthetic review
+5. USS (only after stabilisation — NOT to exclude abruption)
+
+⚠️ Massive APH: activate major haemorrhage protocol. Call for senior help. Aim for delivery.
+
+🔑 Pearl: Fibrinogen <2g/L = significant coagulopathy in pregnancy (normal in pregnancy is 4-6g/L). Treat with fresh frozen plasma and cryoprecipitate. Aim fibrinogen >2g/L.`,
+
+// ── SURGICAL ──────────────────────────────────────────────────
+'surgical:LSCS — Complete Operative Steps':`## Lower Segment Caesarean Section (LSCS)
+RCOG GTG 45 | NICE NG192 | WHO Surgical Safety Checklist
+
+## Pre-Operative
+- Classify urgency: Category 1 (≤30 min) / 2 (≤75 min) / 3 / 4
+- Consent: bladder/bowel injury, haemorrhage, DVT, infection, scar, future pregnancy implications
+- WHO Surgical Safety Checklist — Sign In, Time Out, Sign Out
+- Foley catheter, IV access, FBC/G&S, IV prophylactic antibiotics (co-amoxiclav or cefazolin at skin incision)
+- Wedge under right hip (left lateral tilt) to prevent aortocaval compression
+
+## Operative Steps
+1. Pfannenstiel skin incision (or Joel-Cohen in emergency — transverse 3cm above pubic symphysis, blunt extension)
+2. Subcutaneous tissue — sharp/blunt dissection to rectus sheath
+3. Rectus sheath — transverse incision, separate rectus muscles bluntly in midline
+4. Peritoneum — identify, grasp and open carefully; extend longitudinally
+5. Identify uterovesical fold; incise with scissors and develop bladder flap inferiorly
+6. Lower segment incision — transverse, 1cm below reflection; bluntly extend laterally with fingers (avoid uterine vessels)
+7. Deliver presenting part — hand between symphysis and head, flex and elevate; or Wrigley forceps for impacted head
+8. Deliver shoulders and body; cord clamp and cut
+9. Oxytocin 5 IU slow IV bolus + 40 IU/500ml infusion
+10. Deliver placenta — controlled cord traction (avoid fundal pressure); examine cavity and incision angles
+11. Uterine closure — continuous non-locking suture (Vicryl 1), single or double layer
+12. Ensure haemostasis; check bladder; count swabs/instruments
+13. Peritoneum, rectus sheath (Vicryl 1), subcutaneous (if thick), skin (Monocryl or staples)
+
+## Difficult Situations
+- Impacted head: ask assistant to push head up vaginally; Patwardhan technique for deeply impacted
+- Prematurity / lower segment poorly formed: careful incision, extend upward if needed (J or classical extension)
+- Morbid adherence suspected: do NOT attempt manual delivery — call senior, prepare for hysterectomy
+- Uterine extension/tear: suture angle first, then extend closure — identify ureter before suturing
+
+⚠️ Bladder injury: recognise by seeing catheter bag fill with blood-stained urine or seeing the defect. Repair in 2 layers (3/0 Vicryl), test watertight, leave catheter 7-10 days.
+
+🔑 Pearl: Document decision-to-delivery time for every CS. For Category 1 — if >30 min, a clinical review is required.`,
+
+'surgical:Instrumental Delivery — Ventouse':`## Ventouse (Vacuum) Extraction — RCOG GTG 26
+
+## Prerequisites (ALL must be met)
+- Vertex presentation; ≥34 weeks
+- Fully dilated; membranes ruptured
+- Station at or below ischial spines (0 or positive)
+- Position known (OA preferred; OP/OT possible with metal cup)
+- Adequate pelvis; head not too large
+- Empty bladder (catheterise if needed)
+- Informed consent; theatre with LSCS standby for difficult cases
+- Paediatric team alerted
+
+## Cup Selection
+- Silastic/soft cup (Kiwi OmniCup): first choice for OA, easier to apply
+- Metal cup: preferred for malpositions (OP, OT) — more traction force but more scalp trauma
+
+## Technique
+1. Identify position precisely by locating anterior fontanelle and sagittal suture
+2. Identify flexion point: 3cm anterior to posterior fontanelle (on sagittal suture)
+3. Apply cup centred on flexion point — check no maternal tissue trapped under rim (sweep finger 360°)
+4. Create negative pressure: 0.8 kg/cm² (60 kPa) for Kiwi or 0.2 then 0.8 for metal cup
+5. Traction with contractions and active maternal pushing — direction follows pelvic curve (downward then outward)
+6. Between contractions: maintain pressure but do not pull
+7. As head crowns: release pressure, deliver with controlled guidance, protect perineum
+
+## Abandon if (Three Ps)
+- Three pop-offs (detachments)
+- No progressive descent with each pull
+- Delivery not imminent after 3 pulls or 20 minutes
+
+## After Delivery
+- Examine scalp for chignon, lacerations, cephalhaematoma
+- Inform paediatric team of any concerns
+- Document number of pulls, cup position, pop-offs, time from application to delivery
+
+⚠️ Do not use ventouse <34 weeks (risk of intraventricular haemorrhage). Do not use if face or brow presentation.
+
+🔑 Pearl: The most common reason for failure is incorrect cup placement. Always confirm you are on the flexion point — not over the fontanelle. A misapplied cup creates asynclitism and increases pop-off rate.`,
+
+'surgical:Perineal Repair — All Grades':`## Perineal Tear Classification and Repair — RCOG GTG 29
+
+## Classification
+| Degree | Structure | Repair |
+|---|---|---|
+| 1st | Skin/vaginal epithelium only | Suture only if gaping or bleeding; Vicryl Rapide 2/0 |
+| 2nd | Perineal muscles (not sphincter) | Continuous non-locking deep muscle + skin; Vicryl 2/0 |
+| 3a | <50% external anal sphincter (EAS) | End-to-end or overlap; PDS or Vicryl 3/0 |
+| 3b | >50% EAS torn | Overlap repair preferred; PDS 3/0 |
+| 3c | EAS + internal anal sphincter (IAS) | IAS end-to-end first (Vicryl 3/0), then EAS overlap |
+| 4th | EAS + IAS + anorectal mucosa | Repair mucosa first (Vicryl 3/0 submucosal), then IAS, then EAS |
+
+## 2nd Degree Repair Technique
+1. Assess extent of tear — good lighting, adequate analgesia
+2. Repair vaginal epithelium from apex downward — continuous locking suture
+3. Repair perineal muscles — continuous non-locking from deep to superficial
+4. Repair perineal skin — continuous subcuticular preferred (less painful)
+5. PR examination after repair to confirm sutures not through rectal mucosa
+
+## 3rd/4th Degree (OASI) — Must be in Theatre
+1. Regional or general anaesthesia
+2. Identify and isolate both ends of torn EAS with Allis forceps
+3. IAS: identify as white/shiny, medial to EAS; repair end-to-end with 2/0 PDS mattress sutures
+4. EAS: overlap technique — one end placed over other; 3/0 PDS horizontal mattress sutures
+5. Repair vagina and perineum as above
+6. PR examination to confirm repair; antibiotic prophylaxis; laxative post-operatively
+7. Physiotherapy referral; 6-8 week follow-up with anorectal physiology if symptoms persist
+
+⚠️ All 3rd/4th degree repairs: prescribe prophylactic antibiotics (metronidazole + co-amoxiclav), laxatives for 10 days, and arrange specialist follow-up.
+
+🔑 Pearl: IAS is the key structure for faecal continence. Failing to identify and separately repair the IAS is the most common technical error in OASI repair.`,
+
+'surgical:TAH Operative Steps':`## Total Abdominal Hysterectomy (TAH) — Operative Guide
+
+## Pre-Operative
+- Consent: haemorrhage, visceral injury (bladder, ureter, bowel), VTE, infection, vault granuloma, ovarian failure (if BSO)
+- DVT prophylaxis: LMWH and TED stockings
+- Foley catheter, IV antibiotics at induction
+- Position: supine with slight Trendelenburg, both arms tucked
+
+## Operative Steps
+1. Pfannenstiel or midline incision (midline for large fibroids, malignancy, limited access)
+2. Enter peritoneum; pack bowel superiorly with moist packs; self-retaining retractor (Balfour)
+3. Bimanual assessment of uterus
+4. Clamp, cut, ligate round ligaments bilaterally (Vicryl 1)
+5. Develop broad ligament leaves by blunt dissection
+6. Identify ureter — rolls under finger, peristalses, runs medial to vessels at pelvic brim
+7. Clamp, cut, ligate infundibulopelvic (IP) ligaments if BSO — ensure ureter clear
+   OR divide utero-ovarian ligaments and tubes if conserving ovaries
+8. Develop vesico-uterine fold — identify and push bladder inferiorly 2cm below cervix
+9. Uterine vessels — clamp at level of internal os, perpendicular to uterus; secure with Vicryl 1 transfixion suture
+10. Cardinal ligaments — successive clamping down toward cervix
+11. Uterosacral ligaments — clamp close to cervix
+12. Angle clamp into vagina; circumferential incision around cervix; remove specimen
+13. Vault closure — haemostatic continuous suture incorporating uterosacral ligaments (McCall culdoplasty for vault suspension)
+14. Inspect for haemostasis; irrigate pelvis; check bilateral ureteric peristalsis (blue dye or direct observation)
+15. Mass closure of abdomen or layered closure
+
+## Specific Situations
+- Large fibroid uterus: ligate uterine vessels early; consider morcellation for laparoscopic approach
+- Dense adhesions: sharp dissection close to uterus; identify ureter first
+- Malignancy: extended hysterectomy margins; lymph node sampling
+
+⚠️ Ureteric injury: if suspected — perform cystoscopy, look for efflux. If ureter divided — immediate end-to-end anastomosis or urologist input. Do not close abdomen without confirming ureteric integrity.
+
+🔑 Pearl: The ureter is most at risk at three points — at the pelvic brim under the IP ligament, in the parametrium lateral to the cervix, and in the ureteric tunnel under the uterine artery. 'Water under the bridge' — the uterine artery crosses over the ureter.`,
+
+// ── ORAL ──────────────────────────────────────────────────────
+'oral:Long Case Framework':`## Long Case Examination — NPMCN Part II and WACS Format
+
+## Structure (45-60 minutes with patient, then 30 min presentation to 2 examiners)
+
+## History Taking (15-20 minutes)
+1. Presenting complaint — in the patient's own words
+2. History of PC — duration, severity, associated symptoms, what makes it better/worse
+3. Obstetric history — each pregnancy: year, gestation, mode of delivery, birth weight, outcome, complications
+4. Gynaecological history — LMP, cycle regularity, dysmenorrhoea, IMB, PCB, discharge, smear history
+5. Medical history — hypertension, diabetes, cardiac, renal, thyroid, epilepsy, asthma
+6. Surgical history — include uterine/pelvic surgery
+7. Drug and allergy history
+8. Family history — relevant conditions
+9. Social history — occupation, smoking, alcohol, support network
+
+## Examination (10-15 minutes)
+- General: appearance, pallor, jaundice, oedema, vital signs
+- Abdominal: inspection, palpation (organ size, masses, tenderness), percussion, auscultation
+- Obstetric: SFH, lie, presentation, engagement, FH
+- Gynaecological: bimanual, speculum if appropriate and consented
+
+## Presentation to Examiners
+Use SNAPPS framework:
+- **Summarise**: "This is a 32-year-old G3P2 at 36 weeks presenting with..."
+- **Narrow**: "My differential diagnoses are... I favour X because..."
+- **Analyse**: "I would distinguish A from B by..."
+- **Probe**: "The key investigation I would do is... because..."
+- **Plan**: "My immediate management is... followed by..."
+- **Select**: "This case illustrates [learning point from RCOG/NICE guideline]"
+
+## Common Reasons for Failure
+- Incomplete history (missing obstetric or gynaecological history)
+- Poor examination technique or failure to examine
+- Unable to formulate a differential diagnosis
+- Cannot justify management decisions with evidence
+- Poor communication with the patient
+
+⚠️ Examiners are assessing whether they would trust you to manage this patient as a consultant. Demonstrate leadership, safety awareness, and patient-centred reasoning.
+
+🔑 Pearl: Always ask about red flag symptoms — postcoital bleeding (cervical cancer), postmenopausal bleeding (endometrial cancer), weight loss (malignancy), urinary symptoms (prolapse/incontinence). Missing a red flag in a long case is a fail.`,
+
+'oral:High-Yield Viva Topics — Obstetrics':`## High-Yield Obstetric Viva Topics — NPMCN/WACS Part II
+
+## Pre-eclampsia
+- Diagnostic criteria (ISSHP 2018): BP ≥140/90 + proteinuria OR severe features
+- Risk factors: nulliparity, previous PET, BMI >35, APS, renal disease, diabetes, multiple pregnancy
+- HELLP: haemolysis + elevated liver enzymes + low platelets — deliver regardless of gestation
+- Management: MgSO4 for seizure prophylaxis in severe PET (not mild); antihypertensives; delivery planning
+- Long-term: 8× increased risk of hypertension; 4× stroke risk — lifetime cardiovascular surveillance
+
+## Postpartum Haemorrhage
+- Primary PPH: >500ml vaginal, >1000ml CS, OR any amount causing haemodynamic instability
+- 4 Ts: Tone (70%), Trauma (20%), Tissue (10%), Thrombin (<1%)
+- Management: uterine massage + oxytocin → ergometrine → carboprost → TXA → surgical (balloon → B-Lynch → artery ligation → hysterectomy)
+- Activate major haemorrhage protocol at 1500ml loss
+- Cell salvage: offer in all high-risk cases (praevia, accreta, refusal of blood products)
+
+## Placenta Praevia / Accreta Spectrum
+- Praevia: placenta ≤2cm from internal os — LSCS required
+- Accreta spectrum: abnormal placental invasion — risk with previous CS × praevia
+- Investigation: USS + MRI for accreta; plan in specialist centre
+- Management: elective LSCS 36-37 weeks, multidisciplinary team (obstetrics, urology, vascular, haematology, ITU, cell salvage)
+
+## Preterm Birth
+- Spontaneous PTB risk factors: previous PTB, cervical shortening, PPROM, infection, multiple pregnancy
+- Prevention: cervical cerclage if CL <25mm with history; progesterone if CL <25mm no history
+- PPROM management: corticosteroids if <34+6; erythromycin prophylaxis; deliver at 34 weeks if no infection
+- Betamethasone: 12mg IM × 2 doses 24hrs apart if delivering 24-34+6 weeks
+
+🔑 Pearl: The examiner will push you beyond the guideline — e.g. "What if your hospital doesn't have MgSO4?" or "What would you do if the balloon fails?" Have a plan B for every step of every algorithm.`,
+
+'oral:High-Yield Viva Topics — Gynaecology':`## High-Yield Gynaecological Viva Topics
+
+## Abnormal Uterine Bleeding
+- PALM-COEIN: Polyp, Adenomyosis, Leiomyoma, Malignancy, Coagulopathy, Ovulatory, Endometrial, Iatrogenic, Not classified
+- Investigations: FBC, coagulation, TVUSS (endometrial thickness), endometrial biopsy if >45 or risk factors
+- Medical: TXA, NSAIDs, COCP, norethisterone, LNG-IUS (most effective long-term)
+- Surgical: hysteroscopy + polypectomy, TCRE, hysterectomy
+
+## Ectopic Pregnancy
+- Risk factors: previous ectopic, PID, IVF, progesterone-only contraception, IUCD in situ
+- Diagnosis: serum βhCG + TVUSS; empty uterus with adnexal mass + free fluid
+- MTX criteria: βhCG <3000 IU/L, tube <3.5cm, no fetal heartbeat, haemodynamically stable
+- Surgery: salpingectomy preferred (not salpingotomy) — lower recurrence with salpingectomy for normal contralateral tube
+
+## Ovarian Cancer
+- Risk of Malignancy Index (RMI) = USS score × menopausal status × CA125
+- RMI >200 = refer to cancer centre
+- FIGO staging: I (ovary), II (pelvis), III (peritoneum), IV (distant)
+- Treatment: staging laparotomy + debulking + platinum-based chemotherapy
+- BRCA1/2 mutation: prophylactic salpingo-oophorectomy after family complete
+
+## Endometriosis
+- Symptoms: dysmenorrhoea, deep dyspareunia, dyschezia, subfertility
+- ASRM stages I-IV (minimal/mild/moderate/severe); laparoscopic diagnosis gold standard
+- Medical: COCP, progestogens, GnRH analogues (max 6 months due to bone density)
+- Surgical: laparoscopic excision/ablation; cystectomy for endometrioma >4cm before IVF
+- Fertility: stage III/IV reduces IVF success; treat before IVF if symptomatic
+
+🔑 Pearl: "What would you tell a 30-year-old with stage III endometriosis who wants to have children?" — this integrates fertility counselling, medical management, surgical timing, and IVF planning into one question. Prepare a structured answer.`,
+
+'oral:OSCE Station Approach':`## OSCE Station Approach — General Principles
+
+## The 10-Minute Station Framework
+- Minute 1-2: Read stem carefully; identify what is being tested; introduce yourself to examiner/patient
+- Minutes 2-8: Perform task systematically
+- Minutes 8-10: Summarise, safety-net, ask if examiner has questions
+
+## Common Station Types and Key Points
+
+## History Taking Stations
+- Introduce, confirm patient identity, explain purpose
+- Open question first: "Tell me what's been troubling you"
+- ICE: Ideas, Concerns, Expectations — ask before closing
+- Always cover red flags relevant to presenting complaint
+- Close: safety-net and follow-up plan
+
+## Communication / Breaking Bad News
+- Setting: ensure privacy, have tissue available, offer to have support person present
+- SPIKES framework: Setting, Perception (what do they know), Invitation, Knowledge, Empathy, Summary
+- Use plain language: "I'm afraid the test result shows cancer" — not medical jargon
+- Allow silence; acknowledge emotion before moving to management
+- Never give false hope; never take away all hope
+
+## Consent Stations (e.g. consent for hysterectomy)
+Structure: purpose → procedure → risks (common AND serious) → alternatives → questions
+- Hysterectomy risks to mention: haemorrhage (1 in 100), bladder injury (1 in 100), ureteric injury (1 in 1000), bowel injury, DVT/PE, infection, vault prolapse long-term
+- Alternative to mention: LNG-IUS, endometrial ablation (for AUB)
+
+## CTG Interpretation Station
+- State the four features systematically (rate, variability, accelerations, decelerations)
+- Classify (Normal / Suspicious / Pathological)
+- State your action clearly
+
+⚠️ OSCE examiners mark to a checklist. Even if the station feels awkward, complete all the components systematically — you may pass on components even if the overall performance felt poor.
+
+🔑 Pearl: The most marks are lost in communication stations by failing to acknowledge emotion ("That sounds very worrying — how are you feeling about that?") and by not summarising or safety-netting at the end.`,
+
+// ── EMERGENCIES ───────────────────────────────────────────────
+'emergency:Massive PPH — Complete Algorithm':`## Massive Postpartum Haemorrhage — Stepwise Management
+RCOG GTG 52 | WHO 2015 | ALSO Protocol
+
+## Definition
+Primary PPH: >500ml (vaginal) or >1000ml (CS) OR any loss causing haemodynamic compromise
+
+## Immediate (0-15 minutes) — CALL FOR HELP
+1. Shout for senior obstetrician, midwife coordinator, anaesthetist
+2. Two large-bore IV cannulae (14G); bloods: FBC, coag, fibrinogen, G&S/crossmatch, U&E, LFT
+3. IV fluids — crystalloid (max 2L) then blood products
+4. Oxygen high-flow; continuous monitoring; keep patient warm
+5. Catheterise; monitor urine output (target >30ml/hr)
+6. Bimanual uterine massage if atony
+
+## Drug Therapy — In This Order
+| Drug | Dose | Route | Notes |
+|---|---|---|---|
+| Oxytocin | 5 IU slow IV then 40 IU/500ml | IV | First line always |
+| Ergometrine | 500mcg | IM or slow IV | CI: hypertension, cardiac |
+| Misoprostol | 800mcg | Sublingual | If no oxytocin available |
+| Carboprost | 250mcg q15min × max 8 | Deep IM | CI: asthma |
+| Tranexamic Acid | 1g IV over 10 min; repeat at 30 min | IV | Give within 3 hours |
+
+## Surgical — If Drugs Fail
+1. Examination under anaesthesia — ensure no retained products/trauma
+2. Intrauterine balloon tamponade (Bakri balloon) — fill with 250-500ml saline; pack vagina
+3. Compression sutures — B-Lynch (transverse compression suture on uterus)
+4. Uterine artery ligation — ligate ascending uterine artery bilaterally at level of internal os
+5. Internal iliac artery ligation — bilateral; reduces pulse pressure by 85% in pelvis
+6. Peripartum hysterectomy — definitive; call most experienced surgeon available
+
+## Blood Products
+- Massive haemorrhage protocol: RBC : FFP : platelets = 1:1:1
+- Aim: Hb >80g/L, platelets >50, PT/APTT <1.5× normal, fibrinogen >2g/L
+- Cryoprecipitate if fibrinogen <2g/L
+
+⚠️ Do not delay surgical intervention if medical treatment is not working after 20-30 minutes of appropriate drug therapy.
+
+🔑 Pearl: Tranexamic acid has a 30-minute window for second dose after first — set a timer. The WOMAN trial showed 1 in 67 women were saved from death with TXA. Give it early.`,
+
+'emergency:Eclampsia and Severe PET':`## Eclampsia Management — RCOG Protocol
+
+## Immediate Management of a Fit
+1. Call for help — senior obstetrician, anaesthetist, midwife, porters
+2. Left lateral position; airway management; oxygen high-flow
+3. Do NOT restrain — protect from injury
+4. Time the seizure
+5. IV access × 2
+
+## MgSO4 Protocol — MAGPIE Trial Evidence
+**Loading:** 4g IV over 15-20 minutes (20ml of 20% MgSO4 in 80ml N/S)
+**Maintenance:** 1g/hr IV infusion (50ml of 20% MgSO4 in 450ml N/S at 50ml/hr)
+**Recurrent seizure:** 2g IV over 3-5 minutes (single bolus)
+**Duration:** 24 hours after last seizure OR delivery — whichever is later
+
+## Monitoring (EVERY HOUR)
+- Respiratory rate: MUST be >12/min
+- Urine output: MUST be >25ml/hr
+- Patellar reflexes: MUST be present
+
+## Toxicity Sequence
+Loss of patellar reflexes → RR <12 → respiratory arrest → cardiac arrest
+
+**Antidote: Calcium gluconate 1g IV over 10 min (10ml of 10% solution)** — KEEP AT BEDSIDE AT ALL TIMES
+
+## Antihypertensive Management
+- Treat if BP ≥150/100 (to prevent stroke — leading cause of maternal death in PET)
+- Target: systolic 135-145, diastolic 85-95
+- Labetalol (1st line), Nifedipine oral (2nd line), Hydralazine IV (3rd line)
+
+## Delivery
+- Stabilise first (BP controlled, MgSO4 loaded, senior team present)
+- Steroids if <34+6 weeks
+- Mode of delivery: LSCS if unfavourable cervix, fetal distress, or cannot achieve rapid vaginal delivery
+- Do not delay delivery for steroids to work if maternal or fetal condition is deteriorating
+
+⚠️ Do not give nifedipine sublingually — causes precipitous hypotension and placental abruption.
+
+🔑 Pearl: NUmber needed to treat with MgSO4 for PET (to prevent one eclamptic fit) = 100. For eclampsia (to prevent recurrent fit) = 13. Give it.`,
+
+'emergency:Shoulder Dystocia':`## Shoulder Dystocia — RCOG GTG 42
+
+## Recognition
+Delivered head; recoil back against perineum ("turtle sign"); shoulders do not deliver with routine traction; usually no warning on CTG
+
+## Immediate Response
+- CALL FOR HELP — senior obstetrician, second midwife, anaesthetist, neonatologist
+- Do NOT apply fundal pressure (impacts anterior shoulder further)
+- Do NOT apply excessive traction (risk of brachial plexus injury)
+- Note time of head delivery — every minute counts
+
+## Manoeuvres — HELPERR
+**H** — Call for Help
+**E** — Evaluate for Episiotomy (for internal manoeuvres only — does NOT relieve bony obstruction)
+**L** — Legs (McRoberts): hyperflexion of maternal thighs onto abdomen — straightens sacrum, increases AP diameter — resolves 40% alone
+**P** — Suprapubic Pressure (Rubin): downward, lateral pressure toward fetal face — dislodges anterior shoulder
+**E** — Enter (internal manoeuvres):
+  - Rubin II: pressure on posterior aspect of anterior shoulder (toward fetal chest)
+  - Woods screw: pressure on anterior aspect of posterior shoulder
+  - Reverse Woods (Rubin II + Woods together = rotational)
+**R** — Remove the posterior arm: sweep arm across fetal chest, deliver hand and arm
+**R** — Roll the patient: all-fours (Gaskin) — gravity changes
+
+## Last Resort
+- Zavanelli manoeuvre (cephalic replacement then LSCS)
+- Deliberate clavicle fracture
+- Symphysiotomy
+
+## After Delivery
+- Examine baby: Erb's palsy, fractured clavicle, hypoxia
+- Debrief with mother and team; complete incident form
+- Document: time of head delivery, time of body delivery, manoeuvres used in order
+
+⚠️ Do NOT use fundal pressure — it is dangerous and worsens impaction.
+
+🔑 Pearl: 40% of shoulder dystocias resolve with McRoberts + suprapubic pressure alone. Start here. Do not jump straight to internal manoeuvres.`,
+
+'emergency:Cord Prolapse':`## Cord Prolapse — RCOG GTG 50
+
+## Definition
+Descent of umbilical cord through cervix alongside (occult) or past (overt) the presenting part after membranes have ruptured.
+
+## Risk Factors
+- Malpresentation (breech, transverse, unstable lie)
+- Prematurity, multiple pregnancy, polyhydramnios
+- Artificial rupture of membranes with high presenting part
+- Ballotable presenting part at ARM
+
+## Diagnosis
+- Overt: cord visible or palpable at introitus
+- Occult: unexpected fetal bradycardia at ARM or after membrane rupture
+
+## Immediate Management
+1. Call for help — senior obstetrician, anaesthetist, neonatologist
+2. Digitally elevate presenting part off cord — maintain continuously until delivery
+3. Position: knee-chest (most effective) OR left lateral Trendelenburg OR exaggerated Sims
+4. Fill bladder with 500ml saline (elevates presenting part — use if delay expected)
+5. Do NOT handle cord excessively — causes vasospasm
+6. Keep cord warm and moist if protruding
+
+## Delivery
+- Fully dilated + vertex at/below spines + experienced operator: immediate instrumental delivery
+- All other situations: emergency LSCS Category 1 (≤30 minutes)
+- Continue manual elevation until baby delivered
+
+## If LSCS Unavoidable Delay
+- Maintain bladder filling
+- Do not release digital pressure
+- Transfer to theatre with hand in situ
+
+⚠️ Time is critical — cord compression causes fetal hypoxia within minutes. Every second matters from diagnosis to delivery.
+
+🔑 Pearl: The best position is all-fours (knee-chest) as gravity disimpacts the presenting part from the cord without requiring manual elevation. Use this for transport to theatre.`,
+
+// ── DRUGS ─────────────────────────────────────────────────────
+'drugs:Oxytocin':`## Oxytocin — Complete Protocol
+
+## Pharmacology
+- Synthetic oxytocin; stimulates uterine smooth muscle contraction
+- Half-life: 1-6 minutes IV; 10-40 minutes IM
+- Onset: immediate IV; 2-4 min IM
+
+## Indications and Doses
+
+## PPH Prevention (Active Management of 3rd Stage)
+- 10 IU IM immediately after delivery — preferred route (RCOG, WHO)
+- 5 IU slow IV bolus if IV in situ (give over 1-2 min to avoid hypotension)
+- Infusion: 40 IU in 500ml N/S over 4 hours (alongside IM dose in high-risk patients)
+
+## PPH Treatment
+- 40 IU in 500ml 0.9% saline IV infusion over 4 hours
+- Can give additional 5 IU bolus but limited additional effect if already had prevention dose
+
+## Induction/Augmentation of Labour
+- Start at 1-2 milliunit/min; titrate up every 30 minutes
+- Target: 3-5 contractions per 10 minutes, each lasting 40-60 seconds
+- Maximum: typically 32-40 milliunit/min (follow local protocol)
+- ⚠️ Monitor CTG continuously when on oxytocin infusion
+
+## Elective LSCS Uterotonic
+- 5 IU slow IV bolus at delivery of baby — preferred; reduces PPH risk by 50%
+- Carbetocin 100mcg IV (single dose) is alternative if available — longer acting, no need for infusion
+
+## Cautions
+- Hypotension with rapid IV bolus — always give slowly
+- Hyponatraemia with prolonged high-dose infusion (antidiuretic effect) — monitor fluid balance
+- Uterine hyperstimulation in labour — reduce/stop infusion; left lateral; tocolysis if needed
+
+⚠️ Rapid IV bolus in cardiovascular-compromised patients can cause severe hypotension. Always give slowly.
+
+🔑 Pearl: Oxytocin is the most important single drug in obstetrics. Ensuring its availability in every birth setting is a WHO priority. In settings without IV access, 10 IU IM is as effective for PPH prevention.`,
+
+'drugs:Magnesium Sulphate':`## Magnesium Sulphate (MgSO4) — Complete Guide
+
+## Indications
+1. Eclampsia — treatment and prevention of recurrent seizures (MAGPIE trial)
+2. Severe pre-eclampsia — seizure prophylaxis
+3. Fetal neuroprotection if preterm delivery anticipated <30 weeks
+
+## Preparation
+- Standard solution: 50% MgSO4 (500mg/ml) — MUST DILUTE before use
+- Loading dose: 20ml of 50% MgSO4 + 80ml 0.9% saline = 100ml of 20% solution (4g)
+- Maintenance: 50ml of 50% + 450ml 0.9% saline = 500ml; run at 100ml/hr = 1g/hr
+
+## Dosing — Eclampsia Protocol
+| Dose | Amount | Rate |
+|---|---|---|
+| Loading | 4g IV | Over 15-20 minutes |
+| Maintenance | 1g/hr IV | Until 24hrs after last fit or delivery |
+| Recurrent fit | 2g IV bolus | Over 3-5 minutes (once) |
+
+## Monitoring (MANDATORY every hour)
+- **Respiratory rate**: must be ≥12/min — if <12, reduce or stop infusion
+- **Urine output**: must be ≥25ml/hr — if oliguric, seek specialist advice before continuing
+- **Patellar reflexes**: must be present — absent DTR = first sign of toxicity, reduce/stop infusion
+
+## Toxicity Signs (in order of severity)
+1. Loss of deep tendon reflexes
+2. Respiratory depression (RR <12/min)
+3. Respiratory arrest
+4. Cardiac arrest
+
+## Antidote — Calcium Gluconate
+- **10ml of 10% calcium gluconate (1g) IV over 10 minutes**
+- Must be at the bedside of EVERY patient receiving MgSO4 infusion
+
+## Fetal/Neonatal Effects
+- Neonatal hypermagnesaemia: hypotonia, respiratory depression, poor feeding
+- Inform neonatologist before delivery; have resuscitation equipment ready
+- Calcium gluconate available in neonatal resuscitation room
+
+🔑 Pearl: In resource-limited settings where IV MgSO4 is unavailable, IM regimen (Pritchard): 4g IV loading + 10g IM (5g each buttock); then 5g IM q4h. Equally effective — MAGPIE trial included IM regimen.`,
+
+'drugs:Tranexamic Acid':`## Tranexamic Acid (TXA) — PPH and Obstetric Use
+
+## Mechanism
+Antifibrinolytic — inhibits plasminogen activation, preventing clot breakdown.
+
+## WOMAN Trial Evidence (2017 — 20,000 women)
+- 1g IV TXA given within 3 hours of birth significantly reduced death from PPH (1.5% vs 1.9%, p=0.045)
+- NNT = 267 to prevent one maternal death
+- No increase in thromboembolic events
+- Effect lost if given after 3 hours
+
+## Dose
+- **First dose: 1g IV over 10 minutes** (do not give as rapid bolus — causes nausea and hypotension)
+- **Second dose: 1g IV** if bleeding continues at 30 minutes after first dose, OR if bleeding restarts within 24 hours
+- Preparation: 1g in 10ml ampoule; dilute in 100ml 0.9% saline for IV infusion over 10 min
+- Route: IV only for acute PPH — oral not appropriate for acute use
+
+## Timing — Critical
+- Must be given **within 3 hours of delivery**
+- After 3 hours: no benefit (WOMAN trial subgroup)
+- Give early — alongside, not after, uterotonics
+
+## Indications in Obstetrics
+- Postpartum haemorrhage (primary treatment)
+- Pre-operative (elective LSCS in high-risk patients — antepartum)
+- Trauma — any obstetric trauma with significant bleeding
+
+## Cautions
+- Active thromboembolic disease (relative CI)
+- Haematuria (can cause ureteric obstruction from clot)
+- Colour vision change reported with high doses (rare)
+- Not established in DIC — discuss with haematology
+
+⚠️ Rapid IV bolus causes seizures (high dose) and nausea. Always infuse over 10 minutes minimum.
+
+🔑 Pearl: TXA is on the WHO Essential Medicines List for obstetric haemorrhage. Every labour ward must have it available and staff trained to administer it within 3 hours of PPH.`,
+
+'drugs:all':`## Emergency Drug Summary — OB/GYN
+
+## PPH Drugs
+| Drug | Dose | Route | Key Point |
+|---|---|---|---|
+| Oxytocin | 10 IU IM / 5 IU slow IV; then 40 IU/500ml infusion | IM or IV | First line always |
+| Ergometrine | 500mcg | IM or slow IV | CI: hypertension |
+| Misoprostol | 800mcg sublingual | SL | If no oxytocin |
+| Carboprost | 250mcg q15min, max 8 doses | Deep IM | CI: asthma |
+| TXA | 1g over 10min; repeat at 30min | IV | Within 3 hours |
+| Carbetocin | 100mcg single dose | IV | For elective CS |
+
+## Antihypertensives
+| Drug | Dose | Route | Caution |
+|---|---|---|---|
+| Labetalol | 200mg oral; 50mg IV bolus | Oral/IV | CI: asthma |
+| Nifedipine MR | 10-20mg oral | ORAL ONLY | Never sublingual |
+| Hydralazine | 5mg IV, repeat q20min | IV slow | Hypotension risk |
+| Methyldopa | 250-500mg 2-3× daily | Oral (maintenance) | Safe in pregnancy |
+
+## MgSO4
+- Load: 4g IV over 15-20 min
+- Maintain: 1g/hr
+- Antidote: Calcium gluconate 1g IV over 10 min — KEEP AT BEDSIDE
+
+## Tocolytics
+| Drug | Dose | Gestation limit |
+|---|---|---|
+| Nifedipine | 20mg stat then 10-20mg TDS | Up to 34 weeks |
+| Atosiban | IV infusion per protocol | Up to 33+6 weeks |
+| Indomethacin | 50-100mg PR/oral then 25mg 4-6hrly | Avoid after 32 weeks |
+
+## Corticosteroids (Fetal Lung Maturity)
+- Betamethasone 12mg IM × 2 doses 24hrs apart — 24+0 to 34+6 weeks
+- Dexamethasone 6mg IM × 4 doses 12hrs apart — if betamethasone unavailable
+
+🔑 Pearl: Memorise the order of PPH drugs — Oxytocin first always. Ergometrine second. TXA early and within 3 hours. Carboprost only after the first two have failed. Surgery if drugs fail after 20-30 minutes of appropriate treatment.`
+};
+
+// ── MODULE CONFIG ──────────────────────────────────────────────────────────
+const MODS = {
+  clinical:{name:'Clinical Skills',color:'teal',dot:'#00c9a7',icon:'🧠',
+    topics:['Antenatal Risk Assessment','CTG Interpretation','Hypertensive Disorders','Fetal Growth Restriction','Antepartum Haemorrhage','Gestational Diabetes','Preterm Labour and PPROM','Intrapartum Management','Postnatal Complications','Ectopic Pregnancy','Abnormal Uterine Bleeding','Endometriosis','Ovarian Cysts','Gynaecological Oncology','Infertility','Pelvic Organ Prolapse'],
+    quick:['ctg','hypertensive disorders in pregnancy','fgr doppler surveillance','palm-coein classification']},
+  surgical:{name:'Surgical Skills',color:'amber',dot:'#f0a500',icon:'⚕',
+    topics:['LSCS — Complete Operative Steps','Instrumental Delivery — Ventouse','Instrumental Delivery — Forceps','Perineal Repair — All Grades','TAH Operative Steps','Laparoscopy — Entry and Technique','Salpingectomy for Ectopic','Hysteroscopy','LLETZ Procedure','Manual Removal of Placenta','B-Lynch Suture','Peripartum Hysterectomy'],
+    quick:['lscs','ventouse','3rd degree tear repair technique','laparoscopic entry technique']},
+  oral:{name:'Oral Skills',color:'purple',dot:'#a78bfa',icon:'🎤',
+    topics:['Long Case Framework','High-Yield Viva Topics — Obstetrics','High-Yield Viva Topics — Gynaecology','OSCE Station Approach','NPMCN Part II Format','Breaking Bad News','Consent — Hysterectomy','Journal Club Technique'],
+    quick:['longcase','viva topics obstetrics','osce approach','how to pass the long case']},
+  emergency:{name:'Obstetric Emergencies',color:'coral',dot:'#e05c5c',icon:'🚨',
+    topics:['Massive PPH — Complete Algorithm','Eclampsia and Severe PET','Shoulder Dystocia','Cord Prolapse','Uterine Rupture','Amniotic Fluid Embolism','Placental Abruption','Uterine Inversion','Maternal Collapse','HELLP Syndrome'],
+    quick:['pph','eclampsia','shoulder dystocia manoeuvres','cord prolapse management']},
+  drugs:{name:'Drug Protocols',color:'green',dot:'#4ade80',icon:'💊',
+    topics:['Oxytocin','Magnesium Sulphate','Tranexamic Acid','Misoprostol','Ergometrine','Carboprost','Labetalol','Nifedipine','Betamethasone','Atosiban','All Emergency Drugs'],
+    quick:['all','oxytocin','magnesium sulphate protocol','antihypertensives in pregnancy']}
+};
+
+// ── REFERENCE CARDS ────────────────────────────────────────────────────────
+const REFS=[
+  {ic:'🩸',tt:'PPH Drug Doses',rows:[['Drug','Dose','Route','Notes'],['Oxytocin','10 IU IM; 40 IU/500ml infusion','IM/IV','First line'],['Misoprostol','800mcg','Sublingual','If no oxytocin'],['Ergometrine','500mcg','IM/IV','CI: hypertension'],['Carboprost','250mcg q15min max 8','IM','CI: asthma'],['TXA','1g over 10min; repeat at 30min','IV','Within 3 hours'],['Carbetocin','100mcg single dose','IV','Elective CS only']]},
+  {ic:'⚡',tt:'MgSO4 Protocol',list:['Loading: 4g IV over 15-20 min','Maintenance: 1g/hr IV infusion','Recurrent fit: 2g IV over 3-5 min','Monitor HOURLY: RR >12/min | Urine >25ml/hr | Reflexes present','Toxicity: DTR loss → RR depression → arrest','ANTIDOTE: Calcium gluconate 1g IV — keep at bedside','Duration: 24h after last fit or delivery']},
+  {ic:'📈',tt:'FIGO CTG Classification',rows:[['Category','Features','Action'],['Normal','All 4 features reassuring','Continue monitoring'],['Suspicious','1 non-reassuring','Conservative + continuous CTG'],['Pathological','≥2 non-reassuring or 1 abnormal','Immediate review; expedite delivery'],['Sinusoidal','Smooth sine wave ≥10 min','Emergency delivery']]},
+  {ic:'⚖️',tt:'CTG Features',rows:[['Feature','Reassuring','Non-reassuring','Abnormal'],['Baseline','110-160 bpm','100-109 or 161-180','<100 or >180'],['Variability','5-25 bpm','<5 for 40-90min','>90min <5 or sinusoidal'],['Decels','None / early','Variable <30s','Late / prolonged / variable >30s'],['Accelerations','Present','>32wks absent','—']]},
+  {ic:'👶',tt:'Shoulder Dystocia — HELPERR',list:['H — Call for Help immediately','E — Evaluate for Episiotomy (internal manoeuvres only)','L — Legs: McRoberts manoeuvre (hyperflexion)','P — Suprapubic Pressure (toward fetal face, downward)','E — Enter: Rubin II then Woods screw','R — Remove posterior arm','R — Roll to all-fours (Gaskin)','DOCUMENT time of head then body delivery']},
+  {ic:'🔪',tt:'CS Decision Intervals',list:['Category 1 — Immediate life threat: ≤30 minutes','Category 2 — Compromise not immediate: ≤75 minutes','Category 3 — Needs early delivery: planned timeframe','Category 4 — Elective: scheduled','Document decision time and delivery time for every CS']},
+  {ic:'💉',tt:'Bishop Score',rows:[['Feature','0','1','2','3'],['Dilation (cm)','Closed','1-2','3-4','5+'],['Effacement (%)','0-30','40-50','60-70','80+'],['Station','-3','-2','-1/0','+1/+2'],['Consistency','Firm','Medium','Soft','—'],['Position','Posterior','Mid','Anterior','—']],note:'Score ≥8 = favourable. ≤6 = cervical ripening required.'},
+  {ic:'⚠️',tt:'Antihypertensives',rows:[['Drug','Acute Dose','Route','Caution'],['Labetalol','200mg oral; 50mg IV bolus','Oral/IV','CI: asthma'],['Nifedipine','10-20mg oral; repeat 30min','ORAL ONLY','Never sublingual'],['Hydralazine','5mg IV q20min max 20mg','IV slow','Hypotension'],['Methyldopa','250-500mg 2-3x daily','Oral','Maintenance only']]},
+  {ic:'🧬',tt:'Entrustment Scale (RCOG)',rows:[['Level','Descriptor','Meaning'],['1','Observed','Watched only'],['2','Direct','Hands-on supervision throughout'],['3','Indirect','Supervisor nearby'],['4','Distant','Independent; phone available'],['5','Unsupervised','Teaches others']]},
+  {ic:'📋',tt:'OSATS Requirements',rows:[['Procedure','Min Cases','Summative','Level'],['Emergency LSCS','10 as 1° surgeon','3','5'],['Elective LSCS','10 as 1° surgeon','3','5'],['Ventouse','10 as 1° operator','3','5'],['Forceps','10 as 1° operator','3','5'],['TAH','20 as 1° surgeon','5','5'],['Lap salpingectomy','10','2','5'],['MROP','5','1','5'],['3rd degree repair','5','1','4']]},
+  {ic:'📖',tt:'Key Guidelines',rows:[['Guideline','Topic'],['RCOG GTG 52','PPH prevention and management'],['RCOG GTG 42','Shoulder dystocia'],['RCOG GTG 26','Operative vaginal delivery'],['RCOG GTG 29','3rd/4th degree tears'],['RCOG GTG 65','Caesarean section'],['NICE NG133','Hypertension in pregnancy'],['NICE NG235','Intrapartum care'],['NICE NG201','Antenatal care 2023'],['WHO 2018','Intrapartum care guidelines']]}
+];
+
+// ── LOGBOOK DATA ───────────────────────────────────────────────────────────
+const LB_DATA={
+  obs:{label:'Obstetrics',icon:'🤰',items:[
+    {id:'nvd',name:'Normal vaginal deliveries (conducted)',target:100},
+    {id:'lscs_p',name:'LSCS as primary surgeon',target:50},
+    {id:'ventouse',name:'Ventouse deliveries',target:10},
+    {id:'forceps',name:'Forceps deliveries',target:10},
+    {id:'peri2',name:'2nd degree perineal repair',target:30},
+    {id:'peri3',name:'3rd/4th degree repair',target:5},
+    {id:'pph',name:'PPH management (active)',target:20},
+    {id:'eclampsia',name:'Eclampsia management',target:10},
+    {id:'mrop',name:'Manual removal of placenta',target:10},
+    {id:'cerclage',name:'Cervical cerclage',target:5},
+  ]},
+  gyn:{label:'Gynaecology',icon:'🏥',items:[
+    {id:'tah',name:'TAH as primary surgeon',target:20},
+    {id:'lap_diag',name:'Diagnostic laparoscopy',target:15},
+    {id:'lap_salp',name:'Laparoscopic salpingectomy',target:10},
+    {id:'hyst',name:'Hysteroscopy (diagnostic + operative)',target:15},
+    {id:'lletz',name:'LLETZ procedure',target:10},
+    {id:'erpc',name:'ERPC / MVA',target:20},
+  ]},
+  clinic:{label:'Outpatient',icon:'🩺',items:[
+    {id:'anc',name:'Antenatal consultations',target:100},
+    {id:'gyn_op',name:'Gynaecological OPD',target:100},
+    {id:'colp',name:'Colposcopy examinations',target:20},
+  ]}
+};
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let curMod=null,history=[],loading=false,isOnline=false;
+let lbData={}; try{lbData=JSON.parse(localStorage.getItem('obgyn_lb')||'{}');}catch(e){}
+let apiKey=''; try{apiKey=localStorage.getItem('obgyn_key')||'';}catch(e){}
+
+// ── ONLINE STATUS ──────────────────────────────────────────────────────────
+function checkOnline(){
+  const dot=document.getElementById('onlineDot');
+  if(apiKey&&navigator.onLine){
+    isOnline=true;dot.className='online-dot on';dot.title='Online — AI mode active';
+  }else{
+    isOnline=false;dot.className='online-dot off';
+    dot.title=apiKey?'No internet — using offline content':'No API key — tap Settings to add key';
+  }
+  const badge=document.getElementById('modeBadge');
+  if(badge){badge.textContent=isOnline?'AI LIVE':'OFFLINE';badge.className='mode-badge '+(isOnline?'online':'offline');}
+}
+window.addEventListener('online',checkOnline);
+window.addEventListener('offline',checkOnline);
+setInterval(checkOnline,5000);
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('screen-'+tab).classList.add('active');
+  document.getElementById('navTitle').textContent=
+    tab==='home'?'OB/GYN Clinical Trainer':tab==='ref'?'Reference':tab==='lb'?'Logbook':tab==='set'?'Settings':(curMod?MODS[curMod].name:'Trainer');
+  if(tab==='ref')buildRef();
+  if(tab==='lb')buildLB();
+  if(tab==='set'){const inp=document.getElementById('apiKeyInput');if(inp&&apiKey)inp.value=apiKey;}
+}
+
+function openMod(key){
+  curMod=key;const mod=MODS[key];history=[];
+  checkOnline();
+  document.getElementById('trainTitle').textContent=mod.name;
+  document.getElementById('navTitle').textContent=mod.name;
+  document.getElementById('topicsInner').innerHTML=mod.topics.map(t=>
+    `<button class="chip ${mod.color}" onclick="loadTopic('${esc(t)}')">${t}</button>`).join('');
+  const chat=document.getElementById('chatScroll');
+  chat.innerHTML=`<div class="empty-chat" id="emptyState">
+    <div class="ei">${mod.icon}</div>
+    <div class="et">${mod.name}</div>
+    <div class="es">Tap a topic above or type your question. ${isOnline?'AI Live.':'Built-in content loaded.'}</div>
+    <div class="qph">${mod.quick.slice(0,3).map(q=>`<button class="qpb" onclick="ask('${esc(q)}')">↗ ${q}</button>`).join('')}</div>
+  </div>`;
+  document.getElementById('chatInput').placeholder='Ask about '+mod.name.toLowerCase()+'...';
+  switchTab('train');
+}
+
+function openModAsk(key,q){openMod(key);setTimeout(()=>loadTopic(q),80);}
+function esc(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+function goHome(){switchTab('home');}
+
+// ── TOPIC LOADING ─────────────────────────────────────────────────────────
+function loadTopic(topicOrKey){
+  // find offline content key
+  const mod=curMod?MODS[curMod]:null;
+  const modName=mod?mod.name:'';
+  // try exact key match
+  let content=CONTENT[modName+':'+topicOrKey];
+  // try partial match
+  if(!content){
+    const key=Object.keys(CONTENT).find(k=>k.toLowerCase().includes(topicOrKey.toLowerCase())||topicOrKey.toLowerCase().includes(k.split(':')[1]?.toLowerCase()));
+    if(key)content=CONTENT[key];
+  }
+
+  if(isOnline){
+    // use AI but seed with question
+    document.getElementById('chatInput').value=topicOrKey;
+    sendMsg();
+  } else if(content){
+    showOfflineContent(topicOrKey,content);
+  } else {
+    // generic AI-style question to local content
+    ask(topicOrKey);
+  }
+}
+
+function ask(text){
+  if(isOnline){document.getElementById('chatInput').value=text;sendMsg();}
+  else{
+    // search content
+    const key=Object.keys(CONTENT).find(k=>k.toLowerCase().includes(text.toLowerCase().substring(0,15)));
+    if(key){showOfflineContent(text,CONTENT[key]);}
+    else{showOfflineContent(text,generateGenericContent(text));}
+  }
+}
+
+function generateGenericContent(topic){
+  return `## ${topic}
+🔑 This topic is available in full in the AI mode (requires API key + internet connection).
+
+## Built-in Content Available
+Tap the topic chips above for full offline clinical guides on:
+- Core emergency protocols (PPH, Eclampsia, Shoulder Dystocia, Cord Prolapse)
+- CTG interpretation and classification
+- Key operative procedures (LSCS, Ventouse, TAH, Perineal repair)
+- Drug doses and protocols
+- Long case and viva preparation
+
+## To Enable Full AI Mode
+1. Go to the ⚙️ Settings tab
+2. Enter your Anthropic API key (free at console.anthropic.com)
+3. Connect to internet
+4. All topics will give detailed AI responses
+
+For now, use the Reference tab (📋) for quick dose tables and clinical guidelines.`;
+}
+
+function showOfflineContent(title,content){
+  document.getElementById('emptyState')?.remove();
+  const chat=document.getElementById('chatScroll');
+  // user message
+  const urow=document.createElement('div');urow.className='msg-row user';
+  urow.innerHTML=`<div class="av me">MD</div><div class="bubble">${escHtml(title)}</div>`;
+  chat.appendChild(urow);
+  // ai response
+  const arow=document.createElement('div');arow.className='msg-row ai';
+  const html=fmtContent(content);
+  arow.innerHTML=`<div class="av ai">AI</div><div class="bubble">${html}</div>`;
+  chat.appendChild(arow);
+  history.push({role:'user',content:title},{role:'assistant',content:content});
+  chat.scrollTop=chat.scrollHeight;
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,85)+'px';}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function fmtContent(text){
+  return text
+    .replace(/^## (.+)$/gm,'<div class="bh">$1</div>')
+    .replace(/^# (.+)$/gm,'<div class="bh" style="font-size:15px">$1</div>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/⚠️([^\n]+)/g,'<div class="warn">⚠️$1</div>')
+    .replace(/🔑([^\n]+)/g,'<div class="pearl">🔑$1</div>')
+    .replace(/💎([^\n]+)/g,'<div class="pearl">💎$1</div>')
+    .replace(/^\|(.+)\|$/gm,row=>{
+      const cells=row.split('|').filter((_,i,a)=>i>0&&i<a.length-1);
+      return '<tr>'+cells.map(c=>`<td>${c.trim()}</td>`).join('')+'</tr>';
+    })
+    .replace(/(<tr>.*?<\/tr>(\s*<tr>.*?<\/tr>)*)/gs,tbl=>{
+      const rows=tbl.match(/<tr>.*?<\/tr>/gs)||[];
+      if(rows.length===0)return tbl;
+      const hdr=rows[0].replace(/<td>/g,'<th>').replace(/<\/td>/g,'</th>');
+      const body=rows.slice(1).join('');
+      return `<table><thead>${hdr}</thead><tbody>${body}</tbody></table>`;
+    })
+    .replace(/^(\d+)\.\s+\*?\*?([^:\n*\*]+)\*?\*?:?\s*(.*)/gm,(_,n,title,rest)=>
+      `<div class="step"><div class="sn">STEP ${n}</div><div class="st"><strong>${title.trim()}</strong>${rest?' — '+rest.trim():''}</div></div>`)
+    .replace(/^[-•]\s+(.+)$/gm,'<div class="blt">$1</div>')
+    .replace(/\n\n/g,'<br>').replace(/\n(?!<)/g,'<br>');
+}
+
+function addMsg(role,html){
+  document.getElementById('emptyState')?.remove();
+  const chat=document.getElementById('chatScroll');
+  const row=document.createElement('div');row.className='msg-row '+role;
+  const av=document.createElement('div');av.className='av '+(role==='ai'?'ai':'me');av.textContent=role==='ai'?'AI':'MD';
+  const bub=document.createElement('div');bub.className='bubble';bub.innerHTML=html;
+  row.appendChild(av);row.appendChild(bub);chat.appendChild(row);chat.scrollTop=chat.scrollHeight;
+}
+
+function showTyping(){
+  document.getElementById('emptyState')?.remove();
+  const chat=document.getElementById('chatScroll');
+  const row=document.createElement('div');row.className='msg-row ai';row.id='typr';
+  row.innerHTML='<div class="av ai">AI</div><div class="bubble"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  chat.appendChild(row);chat.scrollTop=chat.scrollHeight;
+}
+function hideTyping(){document.getElementById('typr')?.remove();}
+
+function buildSys(){
+  const mod=curMod?MODS[curMod]:null;
+  return `You are an expert OB/GYN clinical trainer for senior residents and consultants in Nigeria and West Africa.${mod?` Current module: ${mod.name}.`:''}
+Align responses to: NPMCN fellowship curriculum, WACS OB/GYN faculty, RCOG Curriculum 2024, NICE guidelines, WHO standards.
+Style: Consultant-level. Precise doses/thresholds. Numbered steps. ⚠️ warnings. 🔑 pearls. Nigerian/resource-limited context. Reference GTG/NICE/WHO. Mention NPMCN/WACS exam relevance.
+Format: ## headings. Numbered for steps. Bullets (-) for lists. Bold (**) critical values. End with Key Pearls.`;
+}
+
+async function sendMsg(){
+  if(loading)return;
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';
+  loading=true;document.getElementById('sendBtn').disabled=true;
+  addMsg('user',escHtml(text));
+
+  if(!apiKey||!isOnline){
+    // offline — search content
+    history.push({role:'user',content:text});
+    const key=Object.keys(CONTENT).find(k=>k.toLowerCase().includes(text.toLowerCase().substring(0,20))||text.toLowerCase().includes(k.split(':')[1]?.toLowerCase()||''));
+    const reply=key?CONTENT[key]:generateGenericContent(text);
+    history.push({role:'assistant',content:reply});
+    addMsg('ai',fmtContent(reply));
+    loading=false;document.getElementById('sendBtn').disabled=false;return;
+  }
+
+  history.push({role:'user',content:text});
+  showTyping();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:buildSys(),messages:history})
+    });
+    const data=await res.json();hideTyping();
+    if(data.error){
+      const msg=data.error.message||'API error';
+      addMsg('ai',`<div class="warn">⚠️ ${escHtml(msg)}</div><div class="blt">Check your API key in ⚙️ Settings. Get a free key at console.anthropic.com</div>`);
+    }else{
+      const reply=data.content?.map(b=>b.text||'').join('')||'No response.';
+      history.push({role:'assistant',content:reply});addMsg('ai',fmtContent(reply));
+    }
+  }catch(e){
+    hideTyping();
+    addMsg('ai',`<div class="warn">⚠️ Network error — switching to offline mode.</div>`);
+    isOnline=false;checkOnline();
+    const key=Object.keys(CONTENT).find(k=>text.toLowerCase().includes(k.split(':')[1]?.toLowerCase()||''));
+    if(key){setTimeout(()=>{addMsg('ai',fmtContent(CONTENT[key]));},400);}
+  }
+  loading=false;document.getElementById('sendBtn').disabled=false;
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────
+function saveKey(){
+  const val=document.getElementById('apiKeyInput').value.trim();
+  const status=document.getElementById('keyStatus');
+  if(!val){status.className='set-status err';status.textContent='Please enter an API key';return;}
+  if(!val.startsWith('sk-ant')){status.className='set-status err';status.textContent='Key should start with sk-ant... — check you copied it correctly';return;}
+  try{localStorage.setItem('obgyn_key',val);apiKey=val;}catch(e){}
+  status.className='set-status ok';status.textContent='✓ API key saved — AI mode will activate when connected';
+  checkOnline();
+}
+
+// ── REFERENCE ─────────────────────────────────────────────────────────────
+function buildRef(){
+  const c=document.getElementById('refContent');if(c.children.length>0)return;
+  c.innerHTML=REFS.map((card,i)=>{
+    let body='';
+    if(card.rows){
+      const isHeader=card.rows[0].every(c=>typeof c==='string');
+      body=`<table class="ref-tbl">`;
+      card.rows.forEach((r,ri)=>{
+        if(ri===0&&isHeader)body+=`<tr>${r.map(h=>`<th>${h}</th>`).join('')}</tr>`;
+        else body+=`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+      });
+      body+=`</table>`;
+    }
+    if(card.list)body+=`<div class="ref-lst">${card.list.map(it=>`<div class="ref-li">${it}</div>`).join('')}</div>`;
+    if(card.note)body+=`<div class="ref-lst"><div class="ref-li hi">${card.note}</div></div>`;
+    return `<div class="ref-card" id="rc-${i}"><div class="ref-hd" onclick="toggleRef(${i})"><span class="ref-ic">${card.ic}</span><span class="ref-tt">${card.tt}</span><span class="ref-ch">›</span></div><div class="ref-body">${body}</div></div>`;
+  }).join('');
+}
+function toggleRef(i){document.getElementById('rc-'+i).classList.toggle('open');}
+
+// ── LOGBOOK ───────────────────────────────────────────────────────────────
+function buildLB(){
+  const c=document.getElementById('lbContent');if(c.children.length>0)return;
+  let html='';
+  Object.entries(LB_DATA).forEach(([key,sec])=>{
+    html+=`<div class="lb-tracker" id="lb-${key}"><div class="lb-hd" onclick="toggleLB('${key}')"><span class="ref-ic">${sec.icon}</span><span class="lb-tt">${sec.label}</span><span class="lb-ch">›</span></div><div class="lb-body">`;
+    sec.items.forEach(item=>{
+      const cur=lbData[item.id]||0;const pct=Math.min(100,Math.round(cur/item.target*100));
+      html+=`<div class="lb-row"><div class="lb-name">${item.name}</div><div class="lb-tgt">/${item.target}</div><input class="lb-inp" type="number" min="0" value="${cur}" id="lbi-${item.id}" oninput="updateLB('${item.id}',${item.target},this.value)"><div class="lb-bw"><div class="lb-bar" id="lbb-${item.id}" style="width:${pct}%"></div></div><div class="lb-pct" id="lbp-${item.id}">${pct}%</div></div>`;
+    });
+    html+=`<button class="save-btn" onclick="saveLB(event)">💾 Save Progress</button></div></div>`;
+  });
+  c.innerHTML=html;
+}
+function toggleLB(key){document.getElementById('lb-'+key).classList.toggle('open');}
+function updateLB(id,target,val){
+  const cur=Math.max(0,parseInt(val)||0);const pct=Math.min(100,Math.round(cur/target*100));
+  const bar=document.getElementById('lbb-'+id);const pctEl=document.getElementById('lbp-'+id);
+  if(bar)bar.style.width=pct+'%';if(pctEl)pctEl.textContent=pct+'%';lbData[id]=cur;
+}
+function saveLB(e){
+  try{localStorage.setItem('obgyn_lb',JSON.stringify(lbData));
+    const btn=e.target;btn.textContent='✓ Saved';setTimeout(()=>btn.textContent='💾 Save Progress',1800);
+  }catch(err){alert('Storage unavailable on this device.');}
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+checkOnline();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
